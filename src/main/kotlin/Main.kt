@@ -6,6 +6,7 @@ import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.vendors.ForUpdateOption
 import table.UsersTable
 
 fun main() {
@@ -46,6 +47,15 @@ fun main() {
                 UsersTable.email eq "bob@example.com"
             }
             .forUpdate()
+            .map { it[UsersTable.email] }
+            .first()
+
+        // select for update nowait
+        UsersTable.selectAll()
+            .where {
+                UsersTable.email eq "alice@example.com"
+            }
+            .forUpdate(ForUpdateOption.Oracle.ForUpdateNoWait)
             .map { it[UsersTable.email] }
             .first()
 
